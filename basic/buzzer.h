@@ -98,7 +98,7 @@ public:
 
     private:
         const long buzzer_duration = 500;
-        const int buzzer_pin  = 2;
+        const int buzzer_pin  = 6;
         t_buzzer_sound up_note = this->NOTE_A6;
         t_buzzer_sound down_note = this->NOTE_C5;
         const long startup_tempo = 400;
