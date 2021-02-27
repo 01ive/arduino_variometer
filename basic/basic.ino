@@ -1,7 +1,7 @@
 #include "buzzer.h"
 #include "pressure_sensor.h"
 
-//#define DEBUG 1
+#define DEBUG 1
 
 const float pressure_sensibility = 1;
 
@@ -22,6 +22,9 @@ void setup() {
   // Setup app
   pressure.start_up();
   previous_pressure = pressure.readPressure();
+
+  // Sound start
+  buzzer.startup();
 }
 
 void loop() {
