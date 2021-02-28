@@ -1,25 +1,20 @@
 #include "buzzer.h"
 #include "pressure_sensor.h"
+#include "display.h"
 
-#include <LiquidCrystal.h> // includes the LiquidCrystal Library 
-const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
-LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
-
-// #define DEBUG 1
+#define DEBUG 1
 
 const float pressure_sensibility = 1;
 
 Pressure_Sensor pressure;
 Buzzer buzzer;
+Display display;
 
 float current_pressure = 0;
 float previous_pressure = 0;
 
 void setup() {
-  // set up the LCD's number of columns and rows:
-  lcd.begin(16, 2);
-  // Print a message to the LCD.
-  lcd.print("Variometer");
+  display.startup();
 
   #ifdef DEBUG
     // init serial DEBUG
@@ -41,7 +36,8 @@ void setup() {
     }
   }
   previous_pressure = pressure.readPressure();
-  lcd.clear();  
+
+  display.clear();  
 }
 
 void loop() {
@@ -66,12 +62,9 @@ void loop() {
     Serial.print(" Pa\n");
   #endif
 
-  lcd.setCursor(0,0);
-  lcd.print(pressure.readTemperature());
-  lcd.print("C");
-  lcd.print(" ");
-  lcd.print(delta_pressure);
-  lcd.setCursor(0,1);
+  display.print_temp(pressure.readTemperature());
+
+  display.print_pressure(delta_pressure);
 
   if (delta_pressure >= ((float)pressure_sensibility)) {
     #ifdef DEBUG
@@ -79,7 +72,7 @@ void loop() {
     #else
       buzzer.down();
     #endif
-    lcd.print("Up !");
+    display.print_move("Up !  ");
   } 
   else if (delta_pressure < ((float)-pressure_sensibility)){
     #ifdef DEBUG
@@ -87,7 +80,7 @@ void loop() {
     #else
       buzzer.up();
     #endif
-    lcd.print("Down !");
+    display.print_move("Down !");
   }
 
   previous_pressure = current_pressure;
