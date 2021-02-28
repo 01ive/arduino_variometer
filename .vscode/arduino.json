@@ -1,6 +1,6 @@
 {
     "board": "arduino:avr:nano",
-    "sketch": "basic\\basic.ino",
+    "sketch": "vario\\vario.ino",
     "output": "./build",
     "port": "COM4",
     "programmer": "AVRISP mkII",
