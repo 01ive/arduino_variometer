@@ -7,6 +7,7 @@ Paragliding variometer using Arduino
 * Arduino UNO
 * Buzzer
 * BMP280 sensor
+* LCD 16*2
 
 ## Circuit
 
