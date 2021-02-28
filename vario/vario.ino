@@ -5,7 +5,7 @@
 // #define DEBUG 1
 
 // Constants settings for variometer
-const float sampling_ratio = 1;
+const float sampling_ratio = 2;
 const float altitude_sensibility = 1/sampling_ratio;
 const unsigned long sampling_period = 1000/sampling_ratio;
 
