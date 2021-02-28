@@ -53,7 +53,7 @@ void loop() {
   delta_altitude = current_altitude - previous_altitude;
 
   #ifdef DEBUG
-  Serial.print("*********************************\n");
+    Serial.print("*********************************\n");
     Serial.print(F("Current temperature = "));
     Serial.print(pressure.readTemperature());
     Serial.print(" °C\n");
