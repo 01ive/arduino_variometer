@@ -60,6 +60,9 @@ void loop() {
     Serial.print(F("Delta pressure = "));
     Serial.print(delta_pressure);
     Serial.print(" Pa\n");
+    Serial.print("Altitude = ");
+    Serial.print(pressure.readAltitude());
+    Serial.print(" m");
   #endif
 
   display.print_temp(pressure.readTemperature());
