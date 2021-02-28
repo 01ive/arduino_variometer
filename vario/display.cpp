@@ -9,14 +9,15 @@ Display::startup() {
 }
 
 Display::print_temp(float temp) {
+    String text = String(temp) + "C";
     this->setCursor(0, 0);
-    this->print(temp);
-    this->print("C");
+    this->print(text);
 }
 
-Display::print_pressure(float pressure) {
-    this->setCursor(8, 0);
-    this->print(pressure);
+Display::print_altitude(float altitude) {
+    String text = String(altitude) + "m/s";
+    this->setCursor(16 - text.length(), 0);
+    this->print(text);
 }
 
 Display::print_move(const String &text) {

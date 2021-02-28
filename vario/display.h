@@ -10,6 +10,6 @@ class Display : public LiquidCrystal {
         Display::Display();
         Display::startup();
         Display::print_temp(float);
-        Display::print_pressure(float);
+        Display::print_altitude(float);
         Display::print_move(const String &);
 };

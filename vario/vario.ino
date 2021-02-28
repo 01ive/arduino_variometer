@@ -2,17 +2,23 @@
 #include "pressure_sensor.h"
 #include "display.h"
 
-#define DEBUG 1
+// #define DEBUG 1
 
-const float pressure_sensibility = 1;
+// Constants settings for variometer
+const float sampling_ratio = 1;
+const float altitude_sensibility = 1/sampling_ratio;
+const unsigned long sampling_period = 1000/sampling_ratio;
 
+// Objects
 Pressure_Sensor pressure;
 Buzzer buzzer;
 Display display;
 
-float current_pressure = 0;
-float previous_pressure = 0;
+// Global var
+float current_altitude = 0;
+float previous_altitude = 0;
 
+// Setup function
 void setup() {
   display.startup();
 
@@ -23,28 +29,28 @@ void setup() {
     Serial.print("================== PARAGLIDING VARIOMETER ==================\n");
     Serial.print("====================== DEBUG mode ON !======================\n");
     Serial.print("===========================================================\n");
+  #else
+    if( pressure.start_up() == Error_Pressure_Sensor::PRESSURE_SENSOR_OK ) {
+      buzzer.startup();
+    }
+    else {
+      while(1) {
+        buzzer.down();
+        delay(500);
+      }
+    }
   #endif
 
-  // Setup app
-  if( pressure.start_up() == Error_Pressure_Sensor::PRESSURE_SENSOR_OK ) {
-    buzzer.startup();
-  }
-  else {
-    while(1) {
-      buzzer.down();
-      delay(500);
-    }
-  }
-  previous_pressure = pressure.readPressure();
-
+  previous_altitude = pressure.readAltitude();
   display.clear();  
 }
 
+// Infinite loop
 void loop() {
-  float delta_pressure;
+  float delta_altitude;
   
-  current_pressure = pressure.readPressure();
-  delta_pressure = current_pressure - previous_pressure;
+  current_altitude = pressure.readAltitude();
+  delta_altitude = current_altitude - previous_altitude;
 
   #ifdef DEBUG
   Serial.print("*********************************\n");
@@ -52,24 +58,24 @@ void loop() {
     Serial.print(pressure.readTemperature());
     Serial.print(" °C\n");
     Serial.print(F("Current pressure = "));
-    Serial.print(current_pressure);
+    Serial.print(current_altitude);
     Serial.print(" Pa\n");
     Serial.print(F("Previous pressure = "));
-    Serial.print(previous_pressure);
+    Serial.print(previous_altitude);
     Serial.print(" Pa\n");
     Serial.print(F("Delta pressure = "));
-    Serial.print(delta_pressure);
+    Serial.print(delta_altitude);
     Serial.print(" Pa\n");
     Serial.print("Altitude = ");
     Serial.print(pressure.readAltitude());
-    Serial.print(" m");
+    Serial.print(" m\n");
   #endif
 
+  display.clear();
   display.print_temp(pressure.readTemperature());
+  display.print_altitude(delta_altitude*sampling_ratio);
 
-  display.print_pressure(delta_pressure);
-
-  if (delta_pressure >= ((float)pressure_sensibility)) {
+  if (delta_altitude >= ((float)altitude_sensibility)) {
     #ifdef DEBUG
       Serial.print(F("Up !!!!!\n"));
     #else
@@ -77,7 +83,7 @@ void loop() {
     #endif
     display.print_move("Up !  ");
   } 
-  else if (delta_pressure < ((float)-pressure_sensibility)){
+  else if (delta_altitude < ((float)-altitude_sensibility)){
     #ifdef DEBUG
       Serial.print(F("Down !!!!!\n"));
     #else
@@ -86,7 +92,7 @@ void loop() {
     display.print_move("Down !");
   }
 
-  previous_pressure = current_pressure;
-  
-  delay(1000);
+  previous_altitude = current_altitude;
+
+  delay(sampling_period);
 }
