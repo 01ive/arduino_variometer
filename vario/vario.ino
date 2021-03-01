@@ -35,7 +35,7 @@ void setup() {
     }
     else {
       while(1) {
-        buzzer.down();
+        buzzer.play_note(buzzer.NOTE_C5);
         delay(500);
       }
     }
