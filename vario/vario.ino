@@ -30,7 +30,7 @@ void setup() {
     Serial.print("====================== DEBUG mode ON !======================\n");
     Serial.print("===========================================================\n");
   #else
-    if( pressure.start_up() == Error_Pressure_Sensor::PRESSURE_SENSOR_OK ) {
+    if( pressure.start_up() == Pressure_Sensor::PRESSURE_SENSOR_OK ) {
       buzzer.startup();
     }
     else {
