@@ -1,8 +1,12 @@
 #include "buzzer.h"
 #include "pressure_sensor.h"
-#include "display.h"
 
+#define DISPLAY 1
 // #define DEBUG 1
+
+#ifdef DISPLAY
+  #include "display.h"
+#endif
 
 // Constants settings for variometer
 const float sampling_ratio = 2;
@@ -12,7 +16,10 @@ const unsigned long sampling_period = 1000/sampling_ratio;
 // Objects
 Pressure_Sensor pressure;
 Buzzer buzzer;
-Display display;
+
+#ifdef DISPLAY
+  Display display;
+#endif
 
 // Global var
 float current_altitude = 0;
@@ -20,7 +27,9 @@ float previous_altitude = 0;
 
 // Setup function
 void setup() {
-  display.startup();
+  #ifdef DISPLAY
+    display.startup();
+  #endif
 
   #ifdef DEBUG
     // init serial DEBUG
@@ -42,7 +51,10 @@ void setup() {
   #endif
 
   previous_altitude = pressure.readAltitude();
-  display.clear();  
+
+  #ifdef DISPLAY
+    display.clear();  
+  #endif
 }
 
 // Infinite loop
@@ -71,9 +83,11 @@ void loop() {
     Serial.print(" m\n");
   #endif
 
-  display.clear();
-  display.print_temp(pressure.readTemperature());
-  display.print_altitude(delta_altitude*sampling_ratio);
+  #ifdef DISPLAY
+    display.clear();
+    display.print_temp(pressure.readTemperature());
+    display.print_altitude(delta_altitude*sampling_ratio);
+  #endif
 
   if (delta_altitude >= ((float)altitude_sensibility)) {
     #ifdef DEBUG
@@ -81,7 +95,9 @@ void loop() {
     #else
       buzzer.down();
     #endif
-    display.print_move("Up !  ");
+    #ifdef DISPLAY
+      display.print_move("Up !  ");
+    #endif
   } 
   else if (delta_altitude < ((float)-altitude_sensibility)){
     #ifdef DEBUG
@@ -89,10 +105,11 @@ void loop() {
     #else
       buzzer.up();
     #endif
-    display.print_move("Down !");
+    #ifdef DISPLAY
+      display.print_move("Down !");
+    #endif
   }
 
   previous_altitude = current_altitude;
-
   delay(sampling_period);
 }
