@@ -1,7 +1,7 @@
 #include "display.h"
 
 Display::Display() : LiquidCrystal(Display::rs, Display::en, Display::d4, Display::d5, Display::d6, Display::d7) {
-    this->begin(LCD_NBR_CHAR, LCD_NBR_LINE);
+    this->begin(Display::lcd_nbr_char, Display::lcd_nbr_line);
 }
 
 Display::startup() {
