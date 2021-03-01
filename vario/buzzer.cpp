@@ -15,3 +15,7 @@ Buzzer::up() {
 Buzzer::down() {
     tone(this->buzzer_pin, this->down_note, this->buzzer_duration);
 }
+
+Buzzer::play_note(t_buzzer_sound note) {
+  tone(this->buzzer_pin, note, this->buzzer_duration);
+}
