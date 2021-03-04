@@ -13,3 +13,4 @@ Paragliding variometer using Arduino
 
 ![circuit](./schematic/circuit.png)
 
+![proto](./schematic/proto1.png)
