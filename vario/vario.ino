@@ -94,7 +94,7 @@ void loop() {
     #ifdef DEBUG
       Serial.print(F("Up !!!!!\n"));
     #else
-      buzzer.down();
+      buzzer.up();
     #endif
     #ifdef DISPLAY
       display.print_move("Up !  ");
@@ -104,7 +104,7 @@ void loop() {
     #ifdef DEBUG
       Serial.print(F("Down !!!!!\n"));
     #else
-      buzzer.up();
+      buzzer.down();
     #endif
     #ifdef DISPLAY
       display.print_move("Down !");
