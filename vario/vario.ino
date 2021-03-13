@@ -2,7 +2,8 @@
 #include "pressure_sensor.h"
 
 #define DISPLAY 1
-// #define DEBUG 1
+//#define DEBUG 1
+//#define TONE_SETUP 1
 
 #ifdef DISPLAY
   #include "display.h"
@@ -113,3 +114,17 @@ void loop() {
   previous_altitude = current_altitude;
   delay(sampling_period);
 }
+
+#ifdef TONE_SETUP
+  void serialEvent() {
+    String inputString = "";
+
+    while (Serial.available()) {
+      char inChar = (char)Serial.read();
+      inputString += inChar;
+    }
+
+    Serial.print(inputString);
+    buzzer.play_note(inputString.toInt());
+  }
+#endif
