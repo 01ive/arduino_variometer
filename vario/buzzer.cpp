@@ -8,8 +8,9 @@ Buzzer::startup() {
   }
 }
 
-Buzzer::up() {
-    tone(this->buzzer_pin, this->up_note, this->buzzer_duration);
+Buzzer::up(float vertical_speed) {
+    int note = vertical_speed * this->NOTE_AS2;
+    tone(this->buzzer_pin, note, this->buzzer_duration);
 }
 
 Buzzer::down() {

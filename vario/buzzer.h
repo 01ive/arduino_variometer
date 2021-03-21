@@ -93,7 +93,7 @@ public:
     } t_buzzer_sound;
 
     Buzzer::startup();
-    Buzzer::up();
+    Buzzer::up(float vertical_speed);
     Buzzer::down();
     Buzzer::play_note(t_buzzer_sound);
 

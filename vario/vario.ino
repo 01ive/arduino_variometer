@@ -11,7 +11,7 @@
 
 // Constants settings for variometer
 const float sampling_period = 200;
-const float speed_sensibility = 1;
+const float speed_sensibility = 0.7;
 
 // Objects
 Pressure_Sensor pressure;
@@ -103,20 +103,10 @@ void loop() {
     #ifdef DEBUG
       Serial.print(F("Up !!!!!\n"));
     #else
-      buzzer.up();
+      buzzer.up(vertical_speed);
     #endif
     #ifdef DISPLAY
       display.print_move("Up !  ");
-    #endif
-  } 
-  else if (vertical_speed <= -speed_sensibility) {
-    #ifdef DEBUG
-      Serial.print(F("Down !!!!!\n"));
-    #else
-      buzzer.down();
-    #endif
-    #ifdef DISPLAY
-      display.print_move("Down !");
     #endif
   }
 
