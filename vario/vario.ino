@@ -2,7 +2,7 @@
 #include "pressure_sensor.h"
 
 #define DISPLAY 1
-//#define DEBUG 1
+// #define DEBUG 1
 //#define TONE_SETUP 1
 
 #ifdef DISPLAY
@@ -10,9 +10,8 @@
 #endif
 
 // Constants settings for variometer
-const float sampling_ratio = 2;
-const float altitude_sensibility = 1/sampling_ratio;
-const unsigned long sampling_period = 1000/sampling_ratio;
+const float sampling_period = 500;
+const float speed_sensibility = 1;
 
 // Objects
 Pressure_Sensor pressure;
@@ -39,18 +38,23 @@ void setup() {
     Serial.print("================== PARAGLIDING VARIOMETER ==================\n");
     Serial.print("====================== DEBUG mode ON !======================\n");
     Serial.print("===========================================================\n");
-  #else
-    if( pressure.start_up() == Pressure_Sensor::PRESSURE_SENSOR_OK ) {
+  #endif
+  if( pressure.start_up() == Pressure_Sensor::PRESSURE_SENSOR_OK ) {
+    #ifndef DEBUG
       buzzer.startup();
-    }
-    else {
+    #endif
+  }
+  else {
+    #ifndef DEBUG
       while(1) {
         buzzer.play_note(buzzer.NOTE_C5);
         delay(500);
       }
-    }
-  #endif
-
+    #else
+       Serial.print("ERROR during pressure initialization\n");
+    #endif
+  }
+  
   previous_altitude = pressure.readAltitude();
 
   #ifdef DISPLAY
@@ -61,9 +65,11 @@ void setup() {
 // Infinite loop
 void loop() {
   float delta_altitude;
+  float vertical_speed;
   
   current_altitude = pressure.readAltitude();
   delta_altitude = current_altitude - previous_altitude;
+  vertical_speed = delta_altitude*(1000/sampling_period);
 
   #ifdef DEBUG
     Serial.print("*********************************\n");
@@ -82,15 +88,18 @@ void loop() {
     Serial.print("Altitude = ");
     Serial.print(pressure.readAltitude());
     Serial.print(" m\n");
+    Serial.print("Speed = ");
+    Serial.print(vertical_speed);
+    Serial.print(" m\n");
   #endif
 
   #ifdef DISPLAY
     display.clear();
     display.print_temp(pressure.readTemperature());
-    display.print_altitude(delta_altitude*sampling_ratio);
+    display.print_altitude(vertical_speed);
   #endif
 
-  if (delta_altitude >= ((float)altitude_sensibility)) {
+  if (vertical_speed >= speed_sensibility) {
     #ifdef DEBUG
       Serial.print(F("Up !!!!!\n"));
     #else
@@ -100,7 +109,7 @@ void loop() {
       display.print_move("Up !  ");
     #endif
   } 
-  else if (delta_altitude < ((float)-altitude_sensibility)){
+  else if (vertical_speed < -speed_sensibility) {
     #ifdef DEBUG
       Serial.print(F("Down !!!!!\n"));
     #else
