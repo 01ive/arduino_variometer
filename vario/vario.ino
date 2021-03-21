@@ -3,7 +3,7 @@
 
 #define DISPLAY 1
 // #define DEBUG 1
-//#define TONE_SETUP 1
+// #define TONE_SETUP 1
 
 #ifdef DISPLAY
   #include "display.h"
@@ -109,7 +109,7 @@ void loop() {
       display.print_move("Up !  ");
     #endif
   } 
-  else if (vertical_speed < -speed_sensibility) {
+  else if (vertical_speed <= -speed_sensibility) {
     #ifdef DEBUG
       Serial.print(F("Down !!!!!\n"));
     #else
