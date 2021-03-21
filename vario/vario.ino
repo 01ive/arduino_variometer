@@ -10,7 +10,7 @@
 #endif
 
 // Constants settings for variometer
-const float sampling_period = 500;
+const float sampling_period = 200;
 const float speed_sensibility = 1;
 
 // Objects
