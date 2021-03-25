@@ -2,7 +2,7 @@
 #include "pressure_sensor.h"
 
 #define DISPLAY 1
-#define DEBUG 1
+// #define DEBUG 1
 
 #ifdef DISPLAY
   #include "display.h"
@@ -10,16 +10,16 @@
 
 #define VARIO_NBR_OF_BIPS 6
 
-const Buzzer::t_buzzer_sound bips[VARIO_NBR_OF_BIPS] = {  {2000, 400, 50}, 
-                                                          {1000, 400, 200},
-                                                          {800, 300, 300},
-                                                          {600, 200, 400},
-                                                          {400, 100, 500},
-                                                          {200, 100, 600} };
+const Buzzer::t_buzzer_sound bips[VARIO_NBR_OF_BIPS] = {  {2000, 400, 50},    // Down
+                                                          {1000, 200, 220},   // Up 1st level
+                                                          {800, 200, 240},    // Up 2nd level
+                                                          {600, 200, 260},    // Up 3rd level
+                                                          {400, 200, 280},    // Up 4th level
+                                                          {200, 100, 300} };  // Up 5th level
 
 // Constants settings for variometer
 const float sampling_period = 200;
-const float speed_sensibility_up = 0.7;
+const float speed_sensibility_up = 0.8;
 const float speed_sensibility_down = -2;
 
 // Objects
