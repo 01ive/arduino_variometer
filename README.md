@@ -92,3 +92,16 @@ Uncomment ```#define TONE_SETUP 1``` to activate.
 
 **Debug Picture**
 ![proto](./schematic/proto1.png)
+
+-----------------------------------------------------------------------
+
+## docs
+
+BMP280
+https://cdn-shop.adafruit.com/datasheets/BST-BMP280-DS001-11.pdf
+
+MPU6056
+https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-6000-Datasheet1.pdf
+
+Nano pinout 
+https://content.arduino.cc/assets/Pinout-NANO_latest.pdf

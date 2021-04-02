@@ -1,12 +1,9 @@
 #include "buzzer.h"
 #include "pressure_sensor.h"
+#include "accelerometer.h"
 
-#define DISPLAY 1
-// #define DEBUG 1
-
-#ifdef DISPLAY
-  #include "display.h"
-#endif
+#define DEBUG 1
+// #define ACCELEROMETER 1
 
 #define VARIO_NBR_OF_BIPS 6
 
@@ -18,16 +15,17 @@ const Buzzer::t_buzzer_sound bips[VARIO_NBR_OF_BIPS] = {  {2000, 400, 50},    //
                                                           {200, 100, 300} };  // Up 5th level
 
 // Constants settings for variometer
-const float sampling_period = 200;
+const float sampling_period = 1000;
 const float speed_sensibility_up = 0.8;
 const float speed_sensibility_down = -2;
 
 // Objects
-Pressure_Sensor pressure;
+TwoWire I2c;
+Pressure_Sensor pressure(&I2c);
 Buzzer buzzer;
 
-#ifdef DISPLAY
-  Display display;
+#ifdef ACCELEROMETER
+  Adafruit_MPU6050 accel;
 #endif
 
 // Global var
@@ -38,9 +36,6 @@ int select_sound = 0;
 
 // Setup function
 void setup() {
-  #ifdef DISPLAY
-    display.startup();
-  #endif
 
   #ifdef DEBUG
     // init serial DEBUG
@@ -64,22 +59,49 @@ void setup() {
       }
     #else
        Serial.print("ERROR during pressure initialization\n");
+       while(1);
     #endif
   }
+
+  #ifdef ACCELEROMETER
+    if(!accel.begin(0x68, &I2c, 0)) { // 1101000
+      Serial.print("ERROR during accel initialization\n");
+      while(1);
+    }
+  #endif
   
   previous_altitude = pressure.readAltitude();
-
-  #ifdef DISPLAY
-    display.clear();  
-  #endif
 }
 
 // Infinite loop
 void loop() {
   float delta_altitude;
-  
+
   #ifdef DEBUG
-    Serial.print("*********************************\n");
+    #ifdef ACCELEROMETER
+      sensors_event_t a, g, temp;
+      accel.getEvent(&a, &g, &temp);
+      Serial.print("*********************************\n");
+      Serial.print("Acceleration X: ");
+      Serial.print(a.acceleration.x);
+      Serial.print(", Y: ");
+      Serial.print(a.acceleration.y);
+      Serial.print(", Z: ");
+      Serial.print(a.acceleration.z);
+      Serial.println(" m/s^2");
+      Serial.print("Rotation X: ");
+      Serial.print(g.gyro.x);
+      Serial.print(", Y: ");
+      Serial.print(g.gyro.y);
+      Serial.print(", Z: ");
+      Serial.print(g.gyro.z);
+      Serial.println(" rad/s");
+      Serial.print("Temperature: ");
+      Serial.print(temp.temperature);
+      Serial.println(" °C");
+    #endif
+
+    Serial.print("------------------------------\n");
     Serial.print(F("Current temperature = "));
     Serial.print(pressure.readTemperature());
     Serial.print(" °C\n");
@@ -98,12 +120,6 @@ void loop() {
     vertical_speed = delta_altitude*(1000/sampling_period);
   #endif
 
-  #ifdef DISPLAY
-    display.clear();
-    display.print_temp(pressure.readTemperature());
-    display.print_altitude(vertical_speed);
-  #endif
-
   if (vertical_speed >= speed_sensibility_up) {
     select_sound = (int)vertical_speed;
 
@@ -112,15 +128,9 @@ void loop() {
     }
 
     buzzer.repeat_sound(&bips[select_sound]);
-    #ifdef DISPLAY
-      display.print_move("Up !  ");
-    #endif
   }
   else if (vertical_speed <= speed_sensibility_down) {
     buzzer.repeat_sound(&bips[0]);
-    #ifdef DISPLAY
-      display.print_move("Down !");
-    #endif
   }
   else {
     buzzer.stop_sound();
