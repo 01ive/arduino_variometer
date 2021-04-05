@@ -5,7 +5,7 @@ Pressure_Sensor::Pressure_Sensor(TwoWire *theWire) : Adafruit_BMP280(theWire) {
 }
 
 Pressure_Sensor::t_return_code Pressure_Sensor::start_up() {
-  if( !this->begin(0x77, 0x58) ) return Pressure_Sensor::PRESSURE_SENSOR_FAIL;
+  if( !this->begin(0x76, 0x58) ) return Pressure_Sensor::PRESSURE_SENSOR_FAIL;
   
   // https://cdn-shop.adafruit.com/datasheets/BST-BMP280-DS001-11.pdf
 

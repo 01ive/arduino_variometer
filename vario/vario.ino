@@ -3,7 +3,7 @@
 #include "accelerometer.h"
 
 #define DEBUG 1
-// #define ACCELEROMETER 1
+#define ACCELEROMETER 1
 
 #define VARIO_NBR_OF_BIPS 6
 
@@ -15,7 +15,7 @@ const Buzzer::t_buzzer_sound bips[VARIO_NBR_OF_BIPS] = {  {2000, 400, 50},    //
                                                           {200, 100, 300} };  // Up 5th level
 
 // Constants settings for variometer
-const float sampling_period = 1000;
+const float sampling_period = 200;
 const float speed_sensibility_up = 0.8;
 const float speed_sensibility_down = -2;
 
@@ -25,7 +25,7 @@ Pressure_Sensor pressure(&I2c);
 Buzzer buzzer;
 
 #ifdef ACCELEROMETER
-  Adafruit_MPU6050 accel;
+  Adafruit_MPU6050 accel; 
 #endif
 
 // Global var
@@ -106,7 +106,7 @@ void loop() {
     Serial.print(pressure.readTemperature());
     Serial.print(" °C\n");
     Serial.print(F("Current pressure = "));
-    Serial.print(current_altitude);
+    Serial.print(pressure.readPressure());
     Serial.print(" Pa\n");
     Serial.print("Altitude = ");
     Serial.print(pressure.readAltitude());
