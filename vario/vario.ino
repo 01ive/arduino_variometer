@@ -25,7 +25,7 @@ Pressure_Sensor pressure(&I2c);
 Buzzer buzzer;
 
 #ifdef ACCELEROMETER
-  Adafruit_MPU6050 accel; 
+  Accelerometer_Sensor accel(&I2c);
 #endif
 
 // Global var
@@ -64,7 +64,7 @@ void setup() {
   }
 
   #ifdef ACCELEROMETER
-    if(!accel.begin(0x68, &I2c, 0)) { // 1101000
+    if(accel.start_up() == Accelerometer_Sensor::ACCEL_SENSOR_FAIL) {
       Serial.print("ERROR during accel initialization\n");
       while(1);
     }
@@ -88,17 +88,17 @@ void loop() {
       Serial.print(a.acceleration.y);
       Serial.print(", Z: ");
       Serial.print(a.acceleration.z);
-      Serial.println(" m/s^2");
+      Serial.print(" m/s^2\n");
       Serial.print("Rotation X: ");
       Serial.print(g.gyro.x);
       Serial.print(", Y: ");
       Serial.print(g.gyro.y);
       Serial.print(", Z: ");
       Serial.print(g.gyro.z);
-      Serial.println(" rad/s");
+      Serial.print(" rad/s\n");
       Serial.print("Temperature: ");
       Serial.print(temp.temperature);
-      Serial.println(" °C");
+      Serial.print(" °C\n");
     #endif
 
     Serial.print("------------------------------\n");
