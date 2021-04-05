@@ -9,5 +9,5 @@ class Pressure_Sensor : public Adafruit_BMP280 {
         }t_return_code;
 
         Pressure_Sensor::Pressure_Sensor(TwoWire *);
-        Pressure_Sensor::t_return_code start_up();
+        Pressure_Sensor::t_return_code Pressure_Sensor::start_up();
 };
