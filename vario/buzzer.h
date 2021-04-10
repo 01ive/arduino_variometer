@@ -98,7 +98,7 @@ public:
     {
         unsigned long duration;
         unsigned long bip_duration;
-        t_buzzer_bip  bip_note;
+        int  bip_note;
     } t_buzzer_sound;
     
 

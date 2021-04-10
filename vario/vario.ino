@@ -6,19 +6,22 @@
 // #define ACCELEROMETER 1
 #define SOUND_TEST 1
 
-#define VARIO_NBR_OF_BIPS 6
+#define VARIO_NBR_OF_BIPS 7
 
 // TODO https://www.lebipbip.com/fr/paragliding_variometer_explained/
-const Buzzer::t_buzzer_sound bips[VARIO_NBR_OF_BIPS] = {  {2000, 400, 50},    // Down
-                                                          {1000, 200, 220},   // Up 1st level
-                                                          {800, 200, 240},    // Up 2nd level
-                                                          {600, 200, 260},    // Up 3rd level
-                                                          {400, 200, 280},    // Up 4th level
-                                                          {200, 100, 300} };  // Up 5th level
+const Buzzer::t_buzzer_sound bips[VARIO_NBR_OF_BIPS] = {  {500, 1000, 100},    // Down
+                                                          {600, 300, 220},   // Up 1st level
+                                                          {400, 200, 240},    // Up 2nd level
+                                                          {300, 150, 260},    // Up 3rd level
+                                                          {200, 100, 280},    // Up 4th level
+                                                          {200, 100, 300},   // Up 5th level
+                                                          {200, 100, 300} };  // Up 6th level
+
+Buzzer::t_buzzer_sound current_bip;
 
 // Constants settings for variometer
-const float sampling_period = 200;
-const float speed_sensibility_up = 0.8;
+const float sampling_period = 100;
+const float speed_sensibility_up = 1;
 const float speed_sensibility_down = -2;
 
 // Objects
@@ -34,7 +37,36 @@ Buzzer buzzer;
 float current_altitude = 0;
 float previous_altitude = 0;
 float vertical_speed = 0;
-int select_sound = 0;
+
+Buzzer::t_buzzer_sound getSound(float speed) {
+  Buzzer::t_buzzer_sound bip;
+  float vertical_speed_float = 0;
+  int vertical_speed_int = 0;
+
+  if( speed >0 ) {
+    vertical_speed_int = (int)speed;
+    vertical_speed_float = vertical_speed_int - speed;
+
+    if( vertical_speed_int >= VARIO_NBR_OF_BIPS) {
+      vertical_speed_int = VARIO_NBR_OF_BIPS - 1;
+      vertical_speed_float = 0;
+    }
+
+    bip = bips[vertical_speed_int];
+
+    bip.bip_duration -= (bips[vertical_speed_int].bip_duration - bips[vertical_speed_int+1].bip_duration) * vertical_speed_float;
+    bip.bip_note += (bips[vertical_speed_int+1].bip_note - bips[vertical_speed_int].bip_note) * vertical_speed_float;
+    bip.duration -= (bips[vertical_speed_int].duration - bips[vertical_speed_int+1].duration) * vertical_speed_float;
+  } else {
+    bip = bips[0];
+    if(speed < -5) {
+      speed = -5;
+    }
+    bip.bip_note += (10 * speed);
+  }
+
+  return bip;
+}
 
 // Setup function
 void setup() {
@@ -139,16 +171,18 @@ void loop() {
   #endif
 
   if (vertical_speed >= speed_sensibility_up) {
-    select_sound = (int)vertical_speed;
-
-    if( select_sound >= VARIO_NBR_OF_BIPS) {
-      select_sound = VARIO_NBR_OF_BIPS - 1;
-    }
-
-    buzzer.repeat_sound(&bips[select_sound]);
+    current_bip = getSound(vertical_speed);
+    Serial.print(current_bip.duration);
+    Serial.print("\n");
+    Serial.print(current_bip.bip_duration);
+    Serial.print("\n");
+    Serial.print(current_bip.bip_note);
+    Serial.print("\n");
+    buzzer.repeat_sound(&current_bip);
   }
   else if (vertical_speed <= speed_sensibility_down) {
-    buzzer.repeat_sound(&bips[0]);
+    current_bip = getSound(vertical_speed);
+    buzzer.repeat_sound(&current_bip);
   }
   else {
     buzzer.stop_sound();
