@@ -2,11 +2,13 @@
 #include "pressure_sensor.h"
 #include "accelerometer.h"
 
-#define DEBUG 1
-#define ACCELEROMETER 1
+// #define DEBUG 1
+// #define ACCELEROMETER 1
+#define SOUND_TEST 1
 
 #define VARIO_NBR_OF_BIPS 6
 
+// TODO https://www.lebipbip.com/fr/paragliding_variometer_explained/
 const Buzzer::t_buzzer_sound bips[VARIO_NBR_OF_BIPS] = {  {2000, 400, 50},    // Down
                                                           {1000, 200, 220},   // Up 1st level
                                                           {800, 200, 240},    // Up 2nd level
@@ -37,7 +39,7 @@ int select_sound = 0;
 // Setup function
 void setup() {
 
-  #ifdef DEBUG
+  #if DEBUG || SOUND_TEST
     // init serial DEBUG
     Serial.begin(9600);
     Serial.print("\n\n===========================================================\n");
@@ -77,28 +79,42 @@ void setup() {
 void loop() {
   float delta_altitude;
 
+  static float accel_normale, previous_accel_normale;
+
   #ifdef DEBUG
     #ifdef ACCELEROMETER
-      sensors_event_t a, g, temp;
-      accel.getEvent(&a, &g, &temp);
+      accel.tick();
       Serial.print("*********************************\n");
       Serial.print("Acceleration X: ");
-      Serial.print(a.acceleration.x);
+      Serial.print(accel.readAcceleration().x);
       Serial.print(", Y: ");
-      Serial.print(a.acceleration.y);
+      Serial.print(accel.readAcceleration().y);
       Serial.print(", Z: ");
-      Serial.print(a.acceleration.z);
+      Serial.print(accel.readAcceleration().z);
       Serial.print(" m/s^2\n");
       Serial.print("Rotation X: ");
-      Serial.print(g.gyro.x);
+      Serial.print(accel.readGyroscope().x);
       Serial.print(", Y: ");
-      Serial.print(g.gyro.y);
+      Serial.print(accel.readGyroscope().y);
       Serial.print(", Z: ");
-      Serial.print(g.gyro.z);
+      Serial.print(accel.readGyroscope().z);
       Serial.print(" rad/s\n");
       Serial.print("Temperature: ");
-      Serial.print(temp.temperature);
+      Serial.print(accel.readTemperature());
       Serial.print(" °C\n");
+      Serial.print("Normal: ");
+      Serial.print(accel.getAccelerationNormal());
+      Serial.print("\n");
+
+      accel_normale = accel.getAccelerationNormal();
+
+      if( (accel.readGyroscope().x < 0.1) && (accel.readGyroscope().y < 0.1) && (accel.readGyroscope().z < 0.1) ) {
+        if( (accel_normale - previous_accel_normale > 1) || (accel_normale - previous_accel_normale < -1)) {
+          Serial.print("Mount !!!!!!!!!!!!!!!!!!!\n");
+        }
+      }
+      previous_accel_normale = accel_normale;
+
     #endif
 
     Serial.print("------------------------------\n");
@@ -114,7 +130,9 @@ void loop() {
     Serial.print("Speed = ");
     Serial.print(vertical_speed);
     Serial.print(" m/s\n");
-  #else
+  #endif
+
+  #ifndef SOUND_TEST
     current_altitude = pressure.readAltitude();
     delta_altitude = current_altitude - previous_altitude;
     vertical_speed = delta_altitude*(1000/sampling_period);
@@ -141,7 +159,7 @@ void loop() {
   delay(sampling_period);
 }
 
-#ifdef DEBUG
+#ifdef SOUND_TEST
   void serialEvent() {
     String inputString = "";
 
