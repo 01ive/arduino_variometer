@@ -4,24 +4,25 @@
 
 // #define DEBUG 1
 // #define ACCELEROMETER 1
-#define SOUND_TEST 1
+// #define SOUND_TEST 1
 
 #define VARIO_NBR_OF_BIPS 7
 
-// TODO https://www.lebipbip.com/fr/paragliding_variometer_explained/
-const Buzzer::t_buzzer_sound bips[VARIO_NBR_OF_BIPS] = {  {500, 1000, 100},    // Down
+// https://www.lebipbip.com/fr/paragliding_variometer_explained/
+const Buzzer::t_buzzer_sound bips_down =                  {800, 1000, 100};  // Down
+const Buzzer::t_buzzer_sound bips[VARIO_NBR_OF_BIPS] = {  {800, 300, 100},   // 0
                                                           {600, 300, 220},   // Up 1st level
-                                                          {400, 200, 240},    // Up 2nd level
-                                                          {300, 150, 260},    // Up 3rd level
-                                                          {200, 100, 280},    // Up 4th level
+                                                          {400, 200, 240},   // Up 2nd level
+                                                          {300, 150, 260},   // Up 3rd level
+                                                          {200, 100, 280},   // Up 4th level
                                                           {200, 100, 300},   // Up 5th level
-                                                          {200, 100, 300} };  // Up 6th level
+                                                          {200, 100, 300} }; // Up 6th level
 
 Buzzer::t_buzzer_sound current_bip;
 
 // Constants settings for variometer
 const float sampling_period = 100;
-const float speed_sensibility_up = 1;
+const float speed_sensibility_up = 0.8;
 const float speed_sensibility_down = -2;
 
 // Objects
@@ -43,7 +44,7 @@ Buzzer::t_buzzer_sound getSound(float speed) {
   float vertical_speed_float = 0;
   int vertical_speed_int = 0;
 
-  if( speed >0 ) {
+  if( speed > 0 ) {
     vertical_speed_int = (int)speed;
     vertical_speed_float = vertical_speed_int - speed;
 
@@ -55,10 +56,16 @@ Buzzer::t_buzzer_sound getSound(float speed) {
     bip = bips[vertical_speed_int];
 
     bip.bip_duration -= (bips[vertical_speed_int].bip_duration - bips[vertical_speed_int+1].bip_duration) * vertical_speed_float;
-    bip.bip_note += (bips[vertical_speed_int+1].bip_note - bips[vertical_speed_int].bip_note) * vertical_speed_float;
+    bip.bip_note += (bips[vertical_speed_int].bip_note - bips[vertical_speed_int+1].bip_note) * vertical_speed_float;
     bip.duration -= (bips[vertical_speed_int].duration - bips[vertical_speed_int+1].duration) * vertical_speed_float;
+    Serial.print("\nBip duration ");
+    Serial.print(bip.bip_duration);
+    Serial.print("\nNote ");
+    Serial.print(bip.bip_note);
+    Serial.print("\nDuration ");
+    Serial.print(bip.bip_duration);
   } else {
-    bip = bips[0];
+    bip = bips_down;
     if(speed < -5) {
       speed = -5;
     }
@@ -80,9 +87,9 @@ void setup() {
     Serial.print("===========================================================\n");
   #endif
   if( pressure.start_up() == Pressure_Sensor::PRESSURE_SENSOR_OK ) {
-    #ifndef DEBUG
+    // #ifndef DEBUG
       buzzer.startup();
-    #endif
+    // #endif
   }
   else {
     #ifndef DEBUG
@@ -113,6 +120,13 @@ void loop() {
 
   static float accel_normale, previous_accel_normale;
 
+  #ifndef SOUND_TEST
+    // Pressure data
+    current_altitude = pressure.readAltitude();
+    delta_altitude = current_altitude - previous_altitude;
+    vertical_speed = delta_altitude*(1000/sampling_period);
+  #endif
+
   #ifdef DEBUG
     #ifdef ACCELEROMETER
       accel.tick();
@@ -137,47 +151,31 @@ void loop() {
       Serial.print("Normal: ");
       Serial.print(accel.getAccelerationNormal());
       Serial.print("\n");
-
-      accel_normale = accel.getAccelerationNormal();
-
-      if( (accel.readGyroscope().x < 0.1) && (accel.readGyroscope().y < 0.1) && (accel.readGyroscope().z < 0.1) ) {
-        if( (accel_normale - previous_accel_normale > 1) || (accel_normale - previous_accel_normale < -1)) {
-          Serial.print("Mount !!!!!!!!!!!!!!!!!!!\n");
-        }
-      }
-      previous_accel_normale = accel_normale;
-
     #endif
-
-    Serial.print("------------------------------\n");
-    Serial.print(F("Current temperature = "));
-    Serial.print(pressure.readTemperature());
-    Serial.print(" °C\n");
-    Serial.print(F("Current pressure = "));
-    Serial.print(pressure.readPressure());
-    Serial.print(" Pa\n");
-    Serial.print("Altitude = ");
-    Serial.print(pressure.readAltitude());
-    Serial.print(" m\n");
-    Serial.print("Speed = ");
+    Serial.print("\nread2 = ;");
+    Serial.print(current_altitude);
+    Serial.print(";delta = ;");
+    Serial.print(delta_altitude);
+    Serial.print(";speed = ;");
     Serial.print(vertical_speed);
-    Serial.print(" m/s\n");
   #endif
 
   #ifndef SOUND_TEST
-    current_altitude = pressure.readAltitude();
-    delta_altitude = current_altitude - previous_altitude;
-    vertical_speed = delta_altitude*(1000/sampling_period);
+    // Accel data
+    #ifdef ACCELEROMETER
+      accel_normale = accel.getAccelerationNormal();
+
+      if( (accel.readGyroscope().x < 0.1) && (accel.readGyroscope().y < 0.1) && (accel.readGyroscope().z < 0.1) ) {
+          vertical_speed = (vertical_speed - (accel_normale - 7.85)) / 2;
+      }
+      Serial.print(vertical_speed);
+      Serial.print(" m/s\n");
+      previous_accel_normale = accel_normale;
+    #endif
   #endif
 
   if (vertical_speed >= speed_sensibility_up) {
     current_bip = getSound(vertical_speed);
-    Serial.print(current_bip.duration);
-    Serial.print("\n");
-    Serial.print(current_bip.bip_duration);
-    Serial.print("\n");
-    Serial.print(current_bip.bip_note);
-    Serial.print("\n");
     buzzer.repeat_sound(&current_bip);
   }
   else if (vertical_speed <= speed_sensibility_down) {
