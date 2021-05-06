@@ -14,15 +14,12 @@ Mechanical fixation will be realized using action cam standard allowing tones of
 * Arduino Nano Atmega328 *[4.33€]*
 * Piezo Buzzer passive *[2.49€]*
 * BMP280 sensor *[2.66€]*
-* Batterie Shield *[3.49€]*
+* Batterie Shield *[2.99€]*
 * Battery *[12.23€]*
 * Switch On/Off *[0.28€]*
+* I2c DC - DC adapter *[0.80€]*
 
-Total Price **25.48€**
-
-Debug only components
-* LCD 16*2 *[3.18€]*
-* Breadboard and cables *[8€]*
+Total Price **25.78€**
 
 -----------------------------------------------------------------------
 
@@ -56,9 +53,9 @@ Debug only components
 
 -----------------------------------------------------------------------
 
-## Debug mode and callibration mode
+## Callibration mode
 
-Software allows 3 debug and callibration modes
+Software allows debug and callibration modes
 
 ### Serial mode
 
@@ -66,32 +63,11 @@ Using USB serial console to print information. Buzzers are disabled quiet mode.
 
 Uncomment ```#define DEBUG 1``` to activate.
 
-### Display mode
-
-Using arduino LCD to display information
-Temperature and vertical speed in m/s.
-Up or down movement detection.
-
-Uncomment ```#define DISPLAY 1``` to activate.
-
 ### Sound setup
 
 In order to test and found best suitable sound you can use these mode and serial debug link to test buzzer sound.
 
-Uncomment ```#define TONE_SETUP 1``` to activate.
-
------------------------------------------------------------------------
-
-## Electronic
-
-**Debug Breadboard**
-![circuit](./schematic/display.png)
-
-**Debug Schematic**
-![schematic](./schematic/schematic_display.jpg)
-
-**Debug Picture**
-![proto](./schematic/proto1.png)
+Uncomment ```#define SOUND_TEST 1``` to activate.
 
 -----------------------------------------------------------------------
 
