@@ -152,12 +152,13 @@ void loop() {
       Serial.print(accel.getAccelerationNormal());
       Serial.print("\n");
     #endif
-    Serial.print("\nread2 = ;");
+    Serial.print("\naltitude = ");
     Serial.print(current_altitude);
-    Serial.print(";delta = ;");
+    Serial.print(" m ; delta = ");
     Serial.print(delta_altitude);
-    Serial.print(";speed = ;");
+    Serial.print(" m ; speed = ");
     Serial.print(vertical_speed);
+    Serial.print(" m/s");
   #endif
 
   #ifndef SOUND_TEST
