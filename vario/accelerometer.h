@@ -16,8 +16,11 @@ class Accelerometer_Sensor : public Adafruit_MPU6050 {
         sensors_vec_t Accelerometer_Sensor::readGyroscope();
         float Accelerometer_Sensor::readTemperature();
         float Accelerometer_Sensor::getAccelerationNormal();
-    
+        float Accelerometer_Sensor::getRotationFromAccelX();
+        float Accelerometer_Sensor::getRotationFromGyroX();
+
     private:
         TwoWire *_pI2c;
         sensors_event_t _accel, _gyro, _temp;
+        sensors_event_t _previous_gyro_x;
 };
