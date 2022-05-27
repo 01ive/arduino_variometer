@@ -38,21 +38,7 @@ Buzzer buzzer;
 #endif
 
 // Global var
-float current_altitude = 0;
 float previous_altitude = 0;
-float vertical_speed = 0;
-float current_accel = 0;
-float previous_accel = 0;
-float vertical_speed_from_accel = 0;
-
-float gyro_rot_x = 0;
-float gyro_rot_x_new = 0;
-float gyro_rot_y = 0;
-float gyro_rot_Z = 0;
-
-float accel_rot_x = 0;
-
-float angle = 0;
 
 static Buzzer::t_buzzer_sound getSound(float speed) {
   Buzzer::t_buzzer_sound bip;
@@ -110,26 +96,28 @@ void setup() {
     // Serial.print("===========================================================\n");
   #endif
   #ifdef PRESSURE_CENSOR
-  if( pressure.start_up() == Pressure_Sensor::PRESSURE_SENSOR_FAIL ) {
-
-    playErrorSound(10);
-  }
+    if( pressure.start_up() == Pressure_Sensor::PRESSURE_SENSOR_FAIL ) {
+      playErrorSound(10);
+    }
+    previous_altitude = pressure.readAltitude();
   #endif
   #ifdef ACCELEROMETER
     if(accel.start_up() == Accelerometer_Sensor::ACCEL_SENSOR_FAIL) {
       playErrorSound(11);
     }
+    accel.tick();
   #endif
   #ifndef DEBUG
     buzzer.startup();
   #endif
-  previous_altitude = pressure.readAltitude();
 }
 
 // Infinite loop
 void loop() {
+  float current_altitude = 0;
   float delta_altitude;
-  static float accel_normale, previous_accel_normale;
+  float vertical_speed = 0;
+  float vertical_speed_from_accel = 0;
   
   // Pressure data
   #ifdef PRESSURE_CENSOR
@@ -139,12 +127,24 @@ void loop() {
   #endif
 
   #ifdef ACCELEROMETER
-  accel.tick();
+    
+
+    vertical_speed_from_accel += accel.readAcceleration().acceleration.z * ( ((float)(millis()) - ((float)accel.readAcceleration().timestamp)) / 1000.0);
+    
+    if (vertical_speed >= speed_sensibility_up) {
+      current_bip = getSound(vertical_speed);
+      buzzer.repeat_sound(&current_bip);
+    }
+    
     #ifdef DEBUG
-      Serial.print(accel.getRotationFromGyroX());
-      Serial.print(",");
-      Serial.print(accel.getRotationFromAccelX());
-      Serial.print(",");
+      Serial.print(accel.readAcceleration().acceleration.x);
+      Serial.print(", ");
+      Serial.print(accel.readAcceleration().acceleration.y);
+      Serial.print(", ");
+      Serial.print(accel.readAcceleration().acceleration.z);
+      Serial.print(", ");
+      Serial.print(vertical_speed_from_accel);
+      Serial.println("");
     #endif
   #endif
 
@@ -162,5 +162,6 @@ void loop() {
 
   previous_altitude = current_altitude;
   buzzer.sound_tick();
+  accel.tick();
   delay(sampling_period);
 }
