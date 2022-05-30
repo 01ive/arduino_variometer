@@ -1,14 +1,15 @@
 #include "buzzer.h"
 #include <Arduino.h>
 
+#define STARTUP_NBR_NOTE 4
+
 Buzzer::startup() {
   const long startup_tempo = 400;
   const long startup_blank = 200;
-  const int startup_nbr_note = 4;
-  const t_buzzer_bip startup_notes[4] = {this->NOTE_D6, this->NOTE_C6, this->NOTE_B5, this->NOTE_AS5};
-  const long startup_notes_durations[4] = {2, 3, 3, 3};
+  const t_buzzer_bip startup_notes[STARTUP_NBR_NOTE] = {this->NOTE_D6, this->NOTE_C6, this->NOTE_B5, this->NOTE_AS5};
+  const long startup_notes_durations[STARTUP_NBR_NOTE] = {2, 3, 3, 3};
 
-  for(int note=0; note < startup_nbr_note; note++) {
+  for(int note=0; note < STARTUP_NBR_NOTE; note++) {
     tone(this->buzzer_pin, startup_notes[note], startup_notes_durations[note]*startup_tempo);
     delay(startup_blank);   
   }
