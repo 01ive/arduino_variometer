@@ -17,7 +17,7 @@ Buzzer::t_buzzer_sound current_bip;
 
 // Constants settings for variometer
 const float sampling_period = 100;
-const float speed_sensibility_up = 0.8;
+const float speed_sensibility_up = 0.5;
 const float speed_sensibility_down = -2;
 
 // Objects
